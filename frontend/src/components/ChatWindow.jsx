@@ -50,73 +50,39 @@ export default function ChatWindow({
   };
 
   return (
-    <div className="glass-panel" style={{ 
-      padding: '20px', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      height: '650px',
-      justifyContent: 'space-between'
-    }}>
+    <div className="glass-panel p-5 flex flex-col h-[650px] justify-between">
       
       {/* Header Bar */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        borderBottom: '1px solid var(--border-subtle)',
-        paddingBottom: '14px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Bot size={22} color="var(--primary-light)" />
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Step 2: Interactive Video Chat</h2>
+      <div className="flex justify-between items-center border-b border-white/10 pb-3.5">
+        <div className="flex items-center gap-2">
+          <Bot size={22} className="text-indigo-400" />
+          <h2 className="text-base font-semibold text-white">Step 2: Interactive Video Chat</h2>
         </div>
         
         {messages.length > 0 && (
           <button 
             onClick={onClearChat}
-            className="btn-secondary" 
-            style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+            className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-xs px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all"
             title="Clear Chat History"
           >
-            <Trash2 size={14} color="var(--text-muted)" />
+            <Trash2 size={14} className="text-gray-400" />
             <span>Clear</span>
           </button>
         )}
       </div>
 
       {/* Message List Stream */}
-      <div style={{ 
-        flex: 1, 
-        overflowY: 'auto', 
-        padding: '16px 4px', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        gap: '16px' 
-      }}>
+      <div className="flex-1 overflow-y-auto py-4 px-1 flex flex-col gap-4">
         {messages.length === 0 ? (
-          <div style={{ 
-            height: '100%', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            textAlign: 'center',
-            color: 'var(--text-sub)',
-            gap: '16px'
-          }}>
-            <div style={{ 
-              background: 'rgba(99, 102, 241, 0.1)', 
-              padding: '20px', 
-              borderRadius: '50%',
-              color: 'var(--primary-light)'
-            }}>
+          <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 gap-4">
+            <div className="bg-indigo-500/10 p-5 rounded-full text-indigo-400">
               <Sparkles size={32} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.05rem', color: 'var(--text-main)', fontWeight: 600 }}>
+              <h3 className="text-base text-white font-semibold">
                 {hasVideo ? "Ask anything about the video!" : "Load a video to start asking questions"}
               </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '380px', marginTop: '6px' }}>
+              <p className="text-xs text-gray-400 max-w-xs mt-1.5 mx-auto">
                 {hasVideo 
                   ? "The model will answer based strictly on retrieved transcript context chunks." 
                   : "Paste a YouTube link on the left panel first to enable vector search."}
@@ -125,15 +91,14 @@ export default function ChatWindow({
 
             {/* Quick Starter Chips */}
             {hasVideo && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', maxWidth: '440px', marginTop: '8px' }}>
+              <div className="flex flex-wrap gap-2 justify-center max-w-md mt-2">
                 {suggestedQuestions.map((q, idx) => (
                   <button 
                     key={idx} 
                     onClick={() => handleChipClick(q)}
-                    className="btn-secondary"
-                    style={{ fontSize: '0.8rem', borderRadius: '99px', padding: '6px 14px' }}
+                    className="bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all"
                   >
-                    <HelpCircle size={14} color="var(--accent-cyan)" />
+                    <HelpCircle size={14} className="text-cyan-400" />
                     <span>{q}</span>
                   </button>
                 ))}
@@ -144,54 +109,30 @@ export default function ChatWindow({
           messages.map((msg, index) => (
             <div 
               key={index} 
-              style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                gap: '6px'
-              }}
+              className={`flex flex-col gap-1.5 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
             >
-              <div style={{ 
-                display: 'flex', 
-                gap: '10px', 
-                maxWidth: '88%',
-                flexDirection: msg.role === 'user' ? 'row-reverse' : 'row'
-              }}>
+              <div className={`flex gap-2.5 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                 {/* Avatar */}
-                <div style={{ 
-                  minWidth: '32px', 
-                  height: '32px', 
-                  borderRadius: '50%', 
-                  background: msg.role === 'user' ? 'var(--primary-gradient)' : 'rgba(30, 41, 59, 0.9)',
-                  border: '1px solid var(--border-subtle)',
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  color: '#fff',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                }}>
-                  {msg.role === 'user' ? <User size={16} /> : <Bot size={16} color="var(--accent-cyan)" />}
+                <div className={`w-8 h-8 min-w-[32px] rounded-full border border-white/10 flex items-center justify-center text-white shadow-md ${
+                  msg.role === 'user' ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : 'bg-slate-800'
+                }`}>
+                  {msg.role === 'user' ? <User size={16} /> : <Bot size={16} className="text-cyan-400" />}
                 </div>
 
                 {/* Message Content Bubble */}
-                <div style={{ 
-                  background: msg.role === 'user' ? 'var(--bg-user-bubble)' : 'var(--bg-ai-bubble)', 
-                  border: msg.role === 'user' ? 'none' : '1px solid var(--border-subtle)',
-                  padding: '12px 16px', 
-                  borderRadius: msg.role === 'user' ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
-                  color: '#fff',
-                  fontSize: '0.92rem',
-                  lineHeight: '1.5',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                }}>
+                <div className={`px-4 py-3 text-sm leading-relaxed text-white shadow-md ${
+                  msg.role === 'user' 
+                    ? 'bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl rounded-tr-none' 
+                    : 'bg-slate-800/90 border border-white/10 rounded-2xl rounded-tl-none'
+                }`}>
                   {msg.role === 'user' ? (
                     <div>{msg.content}</div>
                   ) : (
                     <ReactMarkdown 
                       components={{
-                        p: ({node, ...props}) => <p style={{ marginBottom: '8px' }} {...props} />,
-                        ul: ({node, ...props}) => <ul style={{ paddingLeft: '20px', marginBottom: '8px' }} {...props} />,
-                        ol: ({node, ...props}) => <ol style={{ paddingLeft: '20px', marginBottom: '8px' }} {...props} />
+                        p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-2 space-y-1" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-2 space-y-1" {...props} />
                       }}
                     >
                       {msg.content}
@@ -200,45 +141,23 @@ export default function ChatWindow({
                 </div>
               </div>
 
-              {/* Expandable Retrieved Context Sources (for AI messages) */}
+              {/* Expandable Context Sources */}
               {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                <div style={{ marginLeft: '42px', marginTop: '4px', maxWidth: '85%' }}>
+                <div className="ml-10 mt-1 max-w-[85%]">
                   <button 
                     onClick={() => toggleSources(index)}
-                    style={{ 
-                      background: 'none', 
-                      border: 'none', 
-                      color: 'var(--text-sub)', 
-                      fontSize: '0.78rem',
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '4px',
-                      cursor: 'pointer',
-                      padding: '2px 6px',
-                      borderRadius: '4px'
-                    }}
+                    className="text-gray-400 hover:text-white text-xs flex items-center gap-1 px-1.5 py-0.5 rounded transition-all"
                   >
-                    <Layers size={13} color="var(--primary-light)" />
+                    <Layers size={13} className="text-indigo-400" />
                     <span>{expandedSources[index] ? 'Hide' : 'View'} Context Chunks ({msg.sources.length})</span>
                     {expandedSources[index] ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                   </button>
 
                   {expandedSources[index] && (
-                    <div style={{ 
-                      marginTop: '8px', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: '8px',
-                      background: 'rgba(15, 23, 42, 0.7)',
-                      padding: '10px 12px',
-                      borderRadius: '10px',
-                      border: '1px solid var(--border-subtle)',
-                      fontSize: '0.8rem',
-                      color: 'var(--text-sub)'
-                    }}>
+                    <div className="mt-2 flex flex-col gap-2 bg-slate-900/80 p-3 rounded-xl border border-white/10 text-xs text-gray-300">
                       {msg.sources.map((src, sIdx) => (
-                        <div key={sIdx} style={{ borderBottom: sIdx < msg.sources.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none', paddingBottom: '6px' }}>
-                          <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>[Chunk #{src.chunk_id + 1}]</span>: "{src.content}"
+                        <div key={sIdx} className="border-b border-white/5 last:border-none pb-1.5 last:pb-0">
+                          <span className="text-cyan-400 font-semibold">[Chunk #{src.chunk_id + 1}]</span>: "{src.content}"
                         </div>
                       ))}
                     </div>
@@ -252,8 +171,8 @@ export default function ChatWindow({
 
         {/* Loading Indicator */}
         {isLoading && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-sub)', fontSize: '0.85rem', marginLeft: '42px' }}>
-            <div className="pulsing-dot" style={{ width: '10px', height: '10px' }}></div>
+          <div className="flex items-center gap-2.5 text-gray-400 text-xs ml-10">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Searching vector store & generating answer...</span>
           </div>
         )}
@@ -262,10 +181,10 @@ export default function ChatWindow({
       </div>
 
       {/* Input Bar */}
-      <form onSubmit={handleSend} style={{ display: 'flex', gap: '10px', borderTop: '1px solid var(--border-subtle)', paddingTop: '14px' }}>
+      <form onSubmit={handleSend} className="flex gap-2.5 border-t border-white/10 pt-3.5">
         <input
           type="text"
-          className="input-field"
+          className="w-full bg-slate-900/80 border border-white/10 text-white placeholder-gray-500 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 transition-all"
           placeholder={hasVideo ? "Ask a question about the video transcript..." : "Process a video first..."}
           value={inputQuestion}
           onChange={(e) => setInputQuestion(e.target.value)}
@@ -273,9 +192,8 @@ export default function ChatWindow({
         />
         <button 
           type="submit" 
-          className="btn-primary"
+          className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:brightness-110 text-white font-semibold px-4.5 py-3 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!hasVideo || isLoading || !inputQuestion.trim()}
-          style={{ padding: '12px 18px' }}
         >
           <Send size={18} />
         </button>

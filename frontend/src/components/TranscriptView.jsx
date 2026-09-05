@@ -27,60 +27,39 @@ export default function TranscriptView({ isOpen, onClose, transcriptData, videoI
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.75)',
-      backdropFilter: 'blur(8px)',
-      zIndex: 1000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      <div className="glass-panel" style={{
-        width: '100%',
-        maxWidth: '850px',
-        maxHeight: '85vh',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        background: '#0d1322'
-      }}>
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-5">
+      <div className="glass-panel w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden bg-slate-950">
+        
         {/* Modal Header */}
-        <div style={{
-          padding: '16px 24px',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <FileText size={20} color="var(--accent-cyan)" />
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Video Transcript ({videoId})</h2>
+        <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center">
+          <div className="flex items-center gap-2.5">
+            <FileText size={20} className="text-cyan-400" />
+            <h2 className="text-lg font-semibold text-white">Video Transcript ({videoId})</h2>
           </div>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <button onClick={handleCopy} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '6px 12px' }}>
-              {copied ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+          <div className="flex items-center gap-2.5">
+            <button 
+              onClick={handleCopy} 
+              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all"
+            >
+              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
               <span>{copied ? "Copied" : "Copy All"}</span>
             </button>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-sub)', cursor: 'pointer' }}>
+            <button 
+              onClick={onClose} 
+              className="text-gray-400 hover:text-white transition-colors"
+            >
               <X size={22} />
             </button>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div style={{ padding: '16px 24px 8px 24px' }}>
-          <div style={{ position: 'relative' }}>
-            <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
+        <div className="px-6 pt-4 pb-2">
+          <div className="relative">
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
-              className="input-field"
-              style={{ paddingLeft: '42px' }}
+              className="w-full bg-slate-900/80 border border-white/10 text-white placeholder-gray-500 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 transition-all"
               placeholder="Search words or phrases in transcript..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -89,37 +68,23 @@ export default function TranscriptView({ isOpen, onClose, transcriptData, videoI
         </div>
 
         {/* Transcript Content Stream */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-2.5">
           {filteredChunks.length > 0 ? (
             filteredChunks.map((chunk, idx) => (
               <div 
                 key={idx}
-                style={{
-                  display: 'flex',
-                  gap: '14px',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.04)',
-                  fontSize: '0.9rem'
-                }}
+                className="flex gap-3.5 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.04] text-sm"
               >
-                <span style={{ 
-                  color: 'var(--accent-cyan)', 
-                  fontWeight: 600, 
-                  fontFamily: 'monospace',
-                  fontSize: '0.8rem',
-                  minWidth: '42px'
-                }}>
+                <span className="text-cyan-400 font-semibold font-mono text-xs min-w-[42px]">
                   {formatTime(chunk.start)}
                 </span>
-                <span style={{ color: 'var(--text-main)', flex: 1 }}>
+                <span className="text-gray-200 flex-1">
                   {chunk.text}
                 </span>
               </div>
             ))
           ) : (
-            <div style={{ padding: '30px', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <div className="py-8 text-center text-gray-500 text-sm">
               No matches found for "{searchTerm}"
             </div>
           )}

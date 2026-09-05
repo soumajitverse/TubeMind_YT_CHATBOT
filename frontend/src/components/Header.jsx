@@ -3,58 +3,35 @@ import { Youtube } from 'lucide-react';
 
 export default function Header({ hasVideo }) {
   return (
-    <header className="glass-panel" style={{ margin: '16px 16px 0 16px', padding: '14px 24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto' }}>
+    <header className="glass-panel mx-4 mt-4 px-6 py-3.5">
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
         
         {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ 
-            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 
-            padding: '8px', 
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.4)'
-          }}>
-            <Youtube size={24} color="#ffffff" />
+        <div className="flex items-center gap-3">
+          <div className="bg-gradient-to-br from-red-500 to-red-600 p-2 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30">
+            <Youtube size={24} className="text-white" />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '1.4rem', fontWeight: 800 }}>Tube<span className="gradient-text">Mind</span></h1>
-              <span style={{ 
-                fontSize: '0.7rem', 
-                background: 'rgba(99, 102, 241, 0.15)', 
-                color: '#818cf8', 
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                padding: '2px 8px', 
-                borderRadius: '99px',
-                fontWeight: 600
-              }}>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-extrabold text-white">
+                Tube<span className="gradient-text">Mind</span>
+              </h1>
+              <span className="text-xs bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full font-semibold">
                 RAG v1.0
               </span>
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-sub)' }}>
+            <p className="text-xs text-gray-400">
               Interactive AI Assistant for YouTube Transcripts
             </p>
           </div>
         </div>
 
         {/* Right Status Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div className="flex items-center gap-3.5">
           {/* Active Model / Status Indicator */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '8px',
-            background: 'rgba(15, 23, 42, 0.6)', 
-            padding: '6px 14px', 
-            borderRadius: '99px',
-            border: '1px solid var(--border-subtle)',
-            fontSize: '0.85rem'
-          }}>
-            <span className="pulsing-dot"></span>
-            <span style={{ color: 'var(--text-sub)', fontWeight: 500 }}>
+          <div className="flex items-center gap-2 bg-slate-900/60 px-3.5 py-1.5 rounded-full border border-white/10 text-xs sm:text-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-gray-300 font-medium">
               {hasVideo ? 'Video Vectorized' : 'Ready for Video'}
             </span>
           </div>
@@ -64,4 +41,3 @@ export default function Header({ hasVideo }) {
     </header>
   );
 }
-

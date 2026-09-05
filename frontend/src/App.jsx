@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from './components/Header';
 import VideoSection from './components/VideoSection';
 import ChatWindow from './components/ChatWindow';
@@ -120,25 +120,16 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="min-h-screen flex flex-col">
       
       {/* Top Navigation */}
       <Header hasVideo={Boolean(videoInfo)} />
 
       {/* Main Grid Layout */}
-      <main style={{ 
-        maxWidth: '1400px', 
-        width: '100%', 
-        margin: '20px auto', 
-        padding: '0 16px',
-        flex: 1,
-        display: 'grid',
-        gridTemplateColumns: 'repeat(12, 1fr)',
-        gap: '20px'
-      }}>
+      <main className="max-w-7xl w-full my-5 mx-auto px-4 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         {/* Left Column: Video Input & Embedded Player (5 cols) */}
-        <div style={{ gridColumn: 'span 5' }}>
+        <div className="lg:col-span-5">
           <VideoSection 
             onProcessVideo={handleProcessVideo}
             videoInfo={videoInfo}
@@ -149,7 +140,7 @@ export default function App() {
         </div>
 
         {/* Right Column: Interactive Chat Window (7 cols) */}
-        <div style={{ gridColumn: 'span 7' }}>
+        <div className="lg:col-span-7">
           <ChatWindow 
             messages={messages}
             onSendMessage={handleSendMessage}
@@ -169,15 +160,6 @@ export default function App() {
         videoId={videoInfo?.video_id}
       />
 
-      {/* Responsive Styles */}
-      <style>{`
-        @media (max-width: 992px) {
-          main {
-            display: flex !important;
-            flex-direction: column !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }

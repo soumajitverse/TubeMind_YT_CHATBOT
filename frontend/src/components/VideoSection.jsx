@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Loader2, PlayCircle, FileText, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, Loader2, PlayCircle, FileText, AlertCircle } from 'lucide-react';
 
 export default function VideoSection({ 
   onProcessVideo, 
@@ -18,22 +18,21 @@ export default function VideoSection({
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div className="glass-panel p-5 flex flex-col gap-5">
       
       {/* Search Input Bar */}
       <div>
-        <h2 style={{ fontSize: '1.1rem', marginBottom: '8px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <PlayCircle size={20} color="var(--primary-light)" />
+        <h2 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
+          <PlayCircle size={20} className="text-indigo-400" />
           Step 1: Input YouTube Video URL
         </h2>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
+        <form onSubmit={handleSubmit} className="flex gap-2.5">
+          <div className="relative flex-1">
+            <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
               type="text"
-              className="input-field"
-              style={{ paddingLeft: '42px' }}
-              placeholder="Paste YouTube Video URL (e.g. https://www.youtube.com/watch?v=Gfr50f6ZBvo or https://youtu.be/...)"
+              className="w-full bg-slate-900/80 border border-white/10 text-white placeholder-gray-500 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              placeholder="Paste YouTube Video URL (e.g. https://www.youtube.com/watch?v=Gfr50f6ZBvo)"
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               disabled={isLoading}
@@ -41,13 +40,12 @@ export default function VideoSection({
           </div>
           <button 
             type="submit" 
-            className="btn-primary"
+            className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:brightness-110 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center gap-2 whitespace-nowrap transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             disabled={isLoading || !inputUrl.trim()}
-            style={{ whiteSpace: 'nowrap' }}
           >
             {isLoading ? (
               <>
-                <Loader2 size={18} className="spin" style={{ animation: 'spin 1s linear infinite' }} />
+                <Loader2 size={18} className="animate-spin" />
                 <span>Processing...</span>
               </>
             ) : (
@@ -59,86 +57,50 @@ export default function VideoSection({
 
       {/* Error Alert if any */}
       {error && (
-        <div style={{ 
-          background: 'rgba(244, 63, 94, 0.1)', 
-          border: '1px solid rgba(244, 63, 94, 0.3)', 
-          color: '#fda4af',
-          padding: '12px 16px',
-          borderRadius: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          fontSize: '0.9rem'
-        }}>
-          <AlertCircle size={20} color="#f43f5e" />
+        <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl flex items-center gap-2.5 text-sm">
+          <AlertCircle size={20} className="text-rose-500 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Video Player & Info Panel */}
       {videoInfo ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="flex flex-col gap-4">
           
           {/* YouTube Embed Player */}
-          <div style={{ 
-            position: 'relative', 
-            paddingBottom: '56.25%', 
-            height: 0, 
-            overflow: 'hidden', 
-            borderRadius: '12px',
-            border: '1px solid var(--border-subtle)',
-            background: '#000'
-          }}>
+          <div className="relative pb-[56.25%] h-0 overflow-hidden rounded-xl border border-white/10 bg-black">
             <iframe
               src={`https://www.youtube.com/embed/${videoInfo.video_id}?autoplay=0`}
               title="YouTube video player"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                borderRadius: '12px'
-              }}
+              className="absolute top-0 left-0 w-full h-full rounded-xl"
             ></iframe>
           </div>
 
           {/* Stats Bar */}
-          <div style={{ 
-            background: 'rgba(15, 23, 42, 0.5)', 
-            padding: '14px', 
-            borderRadius: '12px', 
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '10px'
-          }}>
-            <div style={{ display: 'flex', gap: '16px', fontSize: '0.85rem' }}>
+          <div className="bg-slate-900/50 p-3.5 rounded-xl border border-white/10 flex justify-between items-center flex-wrap gap-2.5">
+            <div className="flex gap-4 text-xs sm:text-sm">
               <div>
-                <span style={{ color: 'var(--text-muted)' }}>Video ID: </span>
-                <span style={{ fontWeight: 600, color: 'var(--accent-cyan)' }}>{videoInfo.video_id}</span>
+                <span className="text-gray-400">Video ID: </span>
+                <span className="font-semibold text-cyan-400">{videoInfo.video_id}</span>
               </div>
               <div>
-                <span style={{ color: 'var(--text-muted)' }}>Chunks: </span>
-                <span style={{ fontWeight: 600 }}>{videoInfo.chunk_count}</span>
+                <span className="text-gray-400">Chunks: </span>
+                <span className="font-semibold text-white">{videoInfo.chunk_count}</span>
               </div>
               <div>
-                <span style={{ color: 'var(--text-muted)' }}>Words: </span>
-                <span style={{ fontWeight: 600 }}>{videoInfo.word_count?.toLocaleString()}</span>
+                <span className="text-gray-400">Words: </span>
+                <span className="font-semibold text-white">{videoInfo.word_count?.toLocaleString()}</span>
               </div>
             </div>
 
             <button 
               onClick={onOpenTranscript}
-              className="btn-secondary"
-              style={{ fontSize: '0.85rem', padding: '6px 12px' }}
+              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium text-xs px-3 py-1.5 rounded-lg flex items-center gap-2 transition-all"
             >
-              <FileText size={15} color="var(--primary-light)" />
+              <FileText size={15} className="text-indigo-400" />
               <span>Full Transcript</span>
             </button>
           </div>
@@ -146,44 +108,20 @@ export default function VideoSection({
         </div>
       ) : (
         /* Placeholder view when no video loaded yet */
-        <div style={{ 
-          padding: '40px 20px', 
-          textAlign: 'center', 
-          border: '2px dashed var(--border-subtle)', 
-          borderRadius: '16px',
-          background: 'rgba(255, 255, 255, 0.01)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '12px'
-        }}>
-          <div style={{ 
-            background: 'rgba(99, 102, 241, 0.1)', 
-            padding: '16px', 
-            borderRadius: '50%',
-            color: 'var(--primary-light)' 
-          }}>
+        <div className="py-10 px-5 text-center border-2 border-dashed border-white/10 rounded-2xl bg-white/[0.01] flex flex-col items-center justify-center gap-3">
+          <div className="bg-indigo-500/10 p-4 rounded-full text-indigo-400">
             <PlayCircle size={36} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1rem', color: 'var(--text-main)', fontWeight: 600 }}>
+            <h3 className="text-base text-white font-semibold">
               No Video Loaded
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '340px', marginTop: '4px' }}>
+            <p className="text-xs text-gray-400 max-w-xs mt-1">
               Enter a YouTube link or ID above to automatically extract captions, generate embeddings, and unlock RAG Q&A.
             </p>
           </div>
         </div>
       )}
-
-      {/* CSS Animation Helper */}
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }
