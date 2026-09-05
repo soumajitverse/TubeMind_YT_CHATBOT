@@ -1,7 +1,7 @@
 import React from 'react';
-import { Youtube, Settings, Sparkles, Database } from 'lucide-react';
+import { Youtube } from 'lucide-react';
 
-export default function Header({ hasVideo, groqKeySet, onOpenSettings }) {
+export default function Header({ hasVideo }) {
   return (
     <header className="glass-panel" style={{ margin: '16px 16px 0 16px', padding: '14px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto' }}>
@@ -58,21 +58,10 @@ export default function Header({ hasVideo, groqKeySet, onOpenSettings }) {
               {hasVideo ? 'Video Vectorized' : 'Ready for Video'}
             </span>
           </div>
-
-          {/* Groq Key Badge */}
-          <button 
-            onClick={onOpenSettings}
-            className="btn-secondary"
-            title="Configure Groq API Key & Settings"
-            style={{ fontSize: '0.85rem', padding: '6px 14px' }}
-          >
-            <Sparkles size={16} color={groqKeySet ? "#10b981" : "#f59e0b"} />
-            <span>{groqKeySet ? "Groq Key Configured" : "Set Groq Key"}</span>
-            <Settings size={14} style={{ marginLeft: '4px', opacity: 0.7 }} />
-          </button>
         </div>
 
       </div>
     </header>
   );
 }
+

@@ -3,17 +3,11 @@ import Header from './components/Header';
 import VideoSection from './components/VideoSection';
 import ChatWindow from './components/ChatWindow';
 import TranscriptView from './components/TranscriptView';
-import SettingsModal from './components/SettingsModal';
 
-// Environment API Base URL (empty for local Vite proxy, set VITE_API_BASE_URL for Vercel deployment)
+// Environment API Base URL (empty for local Vite proxy)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 export default function App() {
-  // Config & Settings
-  const [groqKey, setGroqKey] = useState(() => localStorage.getItem('groq_api_key') || '');
-  const [groqModel, setGroqModel] = useState(() => localStorage.getItem('groq_model') || 'openai/gpt-oss-20b');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
   // Video & Transcript state
   const [videoInfo, setVideoInfo] = useState(null);
   const [transcriptData, setTranscriptData] = useState(null);
@@ -24,23 +18,6 @@ export default function App() {
   // Chat stream state
   const [messages, setMessages] = useState([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
-
-  // Check health on mount
-  const [backendHealth, setBackendHealth] = useState({ has_groq_key: false });
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/api/health`)
-      .then(res => res.json())
-      .then(data => setBackendHealth(data))
-      .catch(err => console.error("Health check error:", err));
-  }, []);
-
-  // Save Settings handler
-  const handleSaveSettings = (newKey, newModel) => {
-    setGroqKey(newKey);
-    setGroqModel(newModel);
-    localStorage.setItem('groq_api_key', newKey);
-    localStorage.setItem('groq_model', newModel);
-  };
 
   // Process Video Handler
   const handleProcessVideo = async (urlOrId) => {
@@ -113,9 +90,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           video_id: videoInfo.video_id,
-          question: question,
-          groq_api_key: groqKey || undefined,
-          model_name: groqModel
+          question: question
         })
       });
 
@@ -144,17 +119,11 @@ export default function App() {
     }
   };
 
-  const groqKeyConfigured = Boolean(groqKey || backendHealth.has_groq_key);
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
       {/* Top Navigation */}
-      <Header 
-        hasVideo={Boolean(videoInfo)}
-        groqKeySet={groqKeyConfigured}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
+      <Header hasVideo={Boolean(videoInfo)} />
 
       {/* Main Grid Layout */}
       <main style={{ 
@@ -198,15 +167,6 @@ export default function App() {
         onClose={() => setIsTranscriptOpen(false)}
         transcriptData={transcriptData}
         videoId={videoInfo?.video_id}
-      />
-
-      {/* Settings Modal */}
-      <SettingsModal 
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        groqKey={groqKey}
-        selectedModel={groqModel}
-        onSave={handleSaveSettings}
       />
 
       {/* Responsive Styles */}
