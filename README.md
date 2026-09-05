@@ -1,24 +1,24 @@
 # 🎥 TubeMind — Interactive AI Assistant for YouTube Transcripts (RAG)
 
-TubeMind is a fullstack **Retrieval-Augmented Generation (RAG)** application that allows users to paste any YouTube video link, automatically extract and index its transcript, and interact with an AI assistant that answers questions based **strictly on the context of the video**.
+TubeMind is a fullstack **Retrieval-Augmented Generation (RAG)** application built with Python (FastAPI, LangChain, FAISS) and React (Vite, Tailwind CSS v4). It allows users to paste any YouTube video link, automatically extract and vector-index its transcript, and interact with an AI assistant that answers questions based **strictly on the context of the video**.
 
 ---
 
 ## 🌟 Key Features
 
 - **Instant YouTube Transcript Processing**: Supports standard YouTube URLs, `youtu.be` links, shorts, embeds, and raw 11-character video IDs.
-- **Robust Scraper with Fallback**: Uses `youtube-transcript-api` with automatic `yt-dlp` fallback to guarantee transcript extraction.
-- **Multilingual Support**: Automatically detects transcript language and translates non-English transcripts to English.
-- **RAG Architecture**:
-  - Semantic Chunking using `RecursiveCharacterTextSplitter`.
-  - Dense Vector Embeddings via `HuggingFaceEmbeddings` (`sentence-transformers/all-MiniLM-L6-v2`).
-  - Fast Similarity Search with `FAISS` Vector Store.
-- **Groq LLM Acceleration**: Ultra-fast LLM inference using Groq models (e.g. `openai/gpt-oss-20b` or custom models).
-- **Interactive UI**:
-  - Embedded YouTube video player.
-  - Interactive transcript view with line search and timestamps.
-  - Dynamic chat window with video context-grounded responses.
-  - In-app Groq API Key & Model settings configuration modal.
+- **Robust Scraper with Fallback**: Uses `youtube-transcript-api` with automatic `yt-dlp` fallback (with mobile/web client spoofing) for reliable transcript retrieval.
+- **Multilingual Support**: Uses `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` to support 50+ languages (English, Hindi, Spanish, French, German, Bengali, etc.).
+- **RAG System Architecture**:
+  - Semantic Chunking via `RecursiveCharacterTextSplitter`.
+  - Multilingual Vector Embeddings via `HuggingFaceEmbeddings`.
+  - In-Memory Similarity Search with `FAISS` Vector Store.
+- **Groq LLM Acceleration**: Fast conversational generation via Groq LLM API.
+- **Modern Glassmorphic Dark UI**:
+  - Built with **Tailwind CSS v4** and Lucide icons.
+  - Embedded YouTube video player & statistics dashboard.
+  - Full transcript viewer modal with real-time keyword search and timestamp navigation.
+  - Interactive chat panel with markdown rendering and expandable retrieved context source chunks.
 
 ---
 
@@ -26,9 +26,9 @@ TubeMind is a fullstack **Retrieval-Augmented Generation (RAG)** application tha
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 18, Vite, Vanilla CSS (Design System), Lucide Icons |
+| **Frontend** | React 18, Vite, Tailwind CSS v4 (`@tailwindcss/vite`), Lucide Icons, React Markdown |
 | **Backend API** | Python 3.11, FastAPI, Uvicorn, Pydantic |
-| **RAG & AI** | LangChain, FAISS (CPU), HuggingFace Embeddings, Groq API |
+| **RAG & AI** | LangChain, FAISS (CPU), HuggingFace Multilingual Embeddings, Groq LLM API |
 | **Scraping** | `youtube-transcript-api`, `yt-dlp` |
 
 ---
@@ -38,16 +38,19 @@ TubeMind is a fullstack **Retrieval-Augmented Generation (RAG)** application tha
 ```text
 YT-chatbot-fullstack/
 ├── backend/
-│   ├── main.py                  # FastAPI server endpoints & CORS setup
+│   ├── main.py                  # FastAPI server endpoints & CORS middleware
 │   ├── requirements.txt         # Python dependencies
 │   ├── services/
 │   │   ├── youtube_service.py   # Transcript extraction & yt-dlp fallback
 │   │   └── rag_service.py       # Chunking, FAISS vector store & RAG chain
 │   └── .env.example             # Backend environment template
 ├── frontend/
-│   ├── src/                     # React components, styles, & App logic
-│   ├── package.json             # Node dependencies & scripts
-│   ├── vite.config.js           # Vite server & proxy configuration
+│   ├── src/
+│   │   ├── components/          # Header, VideoSection, ChatWindow, TranscriptView
+│   │   ├── App.jsx              # Main application layout & state
+│   │   └── index.css            # Tailwind CSS v4 & custom glassmorphism styles
+│   ├── package.json             # Frontend dependencies & scripts
+│   ├── vite.config.js           # Vite dev server & Tailwind v4 plugin config
 │   └── .env.local               # Frontend API URL environment file
 └── README.md                    # Project documentation
 ```
@@ -113,7 +116,7 @@ cd TubeMind_YT_CHATBOT
    ```bash
    python -m uvicorn main:app --reload --port 8000
    ```
-   The backend API will run at `http://localhost:8000`. You can test API docs at `http://localhost:8000/docs`.
+   The backend API will run at `http://localhost:8000`. You can view interactive API docs at `http://localhost:8000/docs`.
 
 ---
 
@@ -148,9 +151,8 @@ Open a **new terminal window/tab** and stay in the root project directory.
 ### Step 4: Open Application
 
 1. Open your browser and navigate to **`http://localhost:3000`**.
-2. Click the **Groq Key Settings** button in the top right header to enter your `Groq API Key` (or configure it in `backend/.env`).
-3. Paste a YouTube URL (e.g., `https://www.youtube.com/watch?v=Gfr50f6ZBvo`) and click **Extract & Index**.
-4. Ask questions in the chat panel!
+2. Paste a YouTube URL (e.g., `https://www.youtube.com/watch?v=Gfr50f6ZBvo`) and click **Extract & Index**.
+3. Once vectorized, ask any question about the video transcript in the interactive chat window!
 
 ---
 
