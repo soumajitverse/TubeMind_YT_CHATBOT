@@ -126,7 +126,7 @@ export default function App() {
       <Header hasVideo={Boolean(videoInfo)} />
 
       {/* Main Grid Layout */}
-      <main className="max-w-7xl w-full my-5 mx-auto px-4 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <main className="max-w-[1440px] w-full my-6 mx-auto px-4 sm:px-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
         
         {/* Left Column: Video Input & Embedded Player (5 cols) */}
         <div className="lg:col-span-5">
