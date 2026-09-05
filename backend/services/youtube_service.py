@@ -1,4 +1,6 @@
+import json
 import re
+import urllib.request
 from typing import Dict, Any, List
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound, VideoUnavailable
 
@@ -37,19 +39,153 @@ def extract_video_id(url_or_id: str) -> str:
     raise ValueError(f"Could not extract a valid 11-character YouTube video ID from URL: '{url_or_id}'")
 
 
+def _fetch_transcript_ytdlp(video_id: str) -> Dict[str, Any]:
+    """
+    Fallback transcript fetcher using yt-dlp to bypass YouTube cloud provider IP blocks.
+    Uses Android & Web innertube extractor args.
+    """
+    try:
+        import yt_dlp
+    except ImportError:
+        raise ValueError("yt-dlp package is not installed on server.")
+
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    ydl_opts = {
+        'skip_download': True,
+        'writesubtitles': True,
+        'writeautomaticsub': True,
+        'subtitleslangs': ['en.*', '.*'],
+        'quiet': True,
+        'no_warnings': True,
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'web']
+            }
+        }
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        try:
+            info = ydl.extract_info(url, download=False)
+        except Exception as e:
+            raise ValueError(f"yt-dlp info extraction failed: {str(e)}")
+
+    subtitles = info.get('subtitles') or {}
+    auto_subs = info.get('automatic_captions') or {}
+
+    sub_track = None
+    lang_name = "English"
+
+    # 1. Search for manual English subtitle
+    for lang in ['en', 'en-US', 'en-GB']:
+        if lang in subtitles:
+            sub_track = subtitles[lang]
+            lang_name = "English"
+            break
+
+    # 2. Search for any manual subtitle
+    if not sub_track and subtitles:
+        first_lang = list(subtitles.keys())[0]
+        sub_track = subtitles[first_lang]
+        lang_name = first_lang
+
+    # 3. Search for auto-generated English subtitle
+    if not sub_track:
+        for lang in ['en', 'en-US', 'en-GB']:
+            if lang in auto_subs:
+                sub_track = auto_subs[lang]
+                lang_name = "English (Auto-generated)"
+                break
+
+    # 4. Search for any auto-generated subtitle
+    if not sub_track and auto_subs:
+        first_lang = list(auto_subs.keys())[0]
+        sub_track = auto_subs[first_lang]
+        lang_name = f"{first_lang} (Auto-generated)"
+
+    if not sub_track:
+        raise ValueError(f"No subtitle or caption tracks found for video '{video_id}'.")
+
+    # Pick format (json3 preferred, then vtt)
+    target_url = None
+    fmt_type = None
+
+    for fmt in sub_track:
+        if fmt.get('ext') == 'json3':
+            target_url = fmt.get('url')
+            fmt_type = 'json3'
+            break
+        elif fmt.get('ext') == 'vtt':
+            target_url = fmt.get('url')
+            fmt_type = 'vtt'
+
+    if not target_url:
+        target_url = sub_track[0].get('url')
+        fmt_type = sub_track[0].get('ext', '')
+
+    # Fetch track data
+    req = urllib.request.Request(target_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+    with urllib.request.urlopen(req) as resp:
+        content = resp.read().decode('utf-8')
+
+    chunks = []
+    text_parts = []
+
+    if fmt_type == 'json3' or 'events' in content:
+        data = json.loads(content)
+        events = data.get('events', [])
+        for event in events:
+            t_start = event.get('tStartMs', 0) / 1000.0
+            t_dur = event.get('dDurationMs', 0) / 1000.0
+            segs = event.get('segs', [])
+            line_text = "".join([s.get('utf8', '') for s in segs if s.get('utf8')]).strip()
+            clean_text = line_text.replace('\n', ' ').strip()
+            if clean_text:
+                text_parts.append(clean_text)
+                chunks.append({
+                    "text": clean_text,
+                    "start": round(t_start, 2),
+                    "duration": round(t_dur, 2)
+                })
+    else:
+        for line in content.splitlines():
+            line_str = line.strip()
+            if line_str and not line_str.startswith('WEBVTT') and '-->' not in line_str and not line_str.isdigit():
+                clean_text = re.sub(r'<[^>]+>', '', line_str).strip()
+                if clean_text:
+                    text_parts.append(clean_text)
+                    chunks.append({
+                        "text": clean_text,
+                        "start": 0.0,
+                        "duration": 0.0
+                    })
+
+    full_transcript = " ".join(text_parts)
+    if not full_transcript:
+        raise ValueError("Extracted transcript content was empty.")
+
+    return {
+        "video_id": video_id,
+        "language": lang_name,
+        "transcript_text": full_transcript,
+        "chunks": chunks,
+        "char_count": len(full_transcript),
+        "word_count": len(full_transcript.split())
+    }
+
 
 def fetch_transcript(video_id: str) -> Dict[str, Any]:
     """
     Fetches transcript for a given video ID in any language.
-    If transcript is in a non-English language, automatically translates it into English.
-    Returns plain text transcript, language info, and structured raw transcript list.
+    Primary: YouTubeTranscriptApi
+    Fallback: yt-dlp with mobile/web client spoofing to bypass cloud IP bans.
     """
     video_id = extract_video_id(video_id)
     
+    # Try primary YouTubeTranscriptApi
     try:
         api = YouTubeTranscriptApi() if callable(YouTubeTranscriptApi) else YouTubeTranscriptApi
         
-        # 1. List all available transcripts for this video
         try:
             transcript_list = api.list(video_id)
         except AttributeError:
@@ -58,14 +194,12 @@ def fetch_transcript(video_id: str) -> Dict[str, Any]:
         transcript_obj = None
         language_info = "English"
 
-        # Try finding direct manual English transcript
         try:
             transcript_obj = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
             language_info = f"{transcript_obj.language}"
         except Exception:
             pass
 
-        # Try finding auto-generated English transcript
         if not transcript_obj:
             try:
                 transcript_obj = transcript_list.find_generated_transcript(['en', 'en-US', 'en-GB'])
@@ -73,7 +207,6 @@ def fetch_transcript(video_id: str) -> Dict[str, Any]:
             except Exception:
                 pass
 
-        # If no English transcript, grab ANY available transcript in any language
         if not transcript_obj:
             available = list(transcript_list)
             if not available:
@@ -81,7 +214,6 @@ def fetch_transcript(video_id: str) -> Dict[str, Any]:
             
             chosen = available[0]
             
-            # If already English, use directly; if non-English & translatable, translate to English
             if chosen.language_code.startswith('en'):
                 transcript_obj = chosen
                 language_info = f"{chosen.language}"
@@ -96,10 +228,8 @@ def fetch_transcript(video_id: str) -> Dict[str, Any]:
                 transcript_obj = chosen
                 language_info = f"{chosen.language}"
 
-        # Fetch transcript items
         transcript_items = transcript_obj.fetch()
 
-        # Normalize items list into text chunks
         chunks = []
         text_parts = []
         
@@ -136,11 +266,12 @@ def fetch_transcript(video_id: str) -> Dict[str, Any]:
             "word_count": len(full_transcript.split())
         }
 
-    except TranscriptsDisabled:
-        raise ValueError(f"Subtitles/Captions are disabled for video '{video_id}'.")
-    except NoTranscriptFound:
-        raise ValueError(f"No subtitles found in any language for video '{video_id}'.")
-    except VideoUnavailable:
-        raise ValueError(f"Video '{video_id}' is unavailable or private.")
-    except Exception as e:
-        raise ValueError(f"Failed to fetch transcript: {str(e)}")
+    except (TranscriptsDisabled, VideoUnavailable):
+        raise
+    except Exception as primary_error:
+        # If primary API fails or is IP blocked, try yt-dlp fallback
+        try:
+            return _fetch_transcript_ytdlp(video_id)
+        except Exception as fallback_error:
+            raise ValueError(f"Could not retrieve transcript via primary or fallback scrapers. Primary error: {str(primary_error)}. Fallback error: {str(fallback_error)}")
+

@@ -11,3 +11,4 @@ langchain-huggingface>=0.0.3
 langchain-groq>=0.1.5
 faiss-cpu>=1.7.4
 sentence-transformers>=2.2.2
+yt-dlp>=2024.3.10
