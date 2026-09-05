@@ -1,0 +1,24 @@
+# Root GitIgnore for YouTube Chatbot Fullstack
+
+# Environment & Secret files
+.env
+*.env
+backend/.env
+
+# Dependencies & Builds
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Python cache & virtualenvs
+__pycache__/
+backend/__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
